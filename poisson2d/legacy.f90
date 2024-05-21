@@ -1,25 +1,33 @@
-module rhofunc
-implicit none
-public
-integer, parameter :: dp=kind(0.d0)
-contains
-    pure real(dp) function rho(x,y)
-        real(dp), intent(in) :: x,y
-        if (x > 0.6_dp .and. x < 0.8_dp .and. y > 0.6_dp .and. y<0.8_dp) then
-            rho = 1.0_dp
-        else if (x> 0.2_dp .and. x<0.4_dp .and. y>0.2_dp .and. y<0.4_dp) then
-            rho = -1.0_dp
-        else
-            rho = 0.0_dp
-        end if
-    end function
+module rhs_module
+    implicit none
+    public
 
+    integer, parameter :: precision = 15, range = 307
+    integer, parameter :: dp = selected_real_kind(precision, range)
+
+    interface
+        pure real(dp) module function rho(x, y)
+            implicit none
+            real(dp), intent(in) :: x, y
+        end function
+    end interface
 end module
 
-program poisson
-    use rhofunc, only: rho
+submodule (rhs_module) rho_definition
     implicit none
-    integer, parameter :: dp = kind(0.d0)
+    contains
+    module procedure rho
+        if (all([x, y] > 0.6_dp .and. [x, y] < 0.8_dp)) then
+            rho = 1.0_dp
+        else
+            rho = merge(-1.0_dp, 0.0_dp, all([x, y]>0.2_dp .and. [x, y] < 0.4_dp))
+        endif
+    end procedure
+end submodule
+
+program poisson
+    use rhs_module, only: rho, dp
+    implicit none
 
     !----- Physical parameters -----
     integer , parameter :: m = 300
