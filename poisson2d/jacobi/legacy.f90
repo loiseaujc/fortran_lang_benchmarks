@@ -85,7 +85,6 @@ program poisson
 
 contains
      pure real(dp) function rho(x, y)
-        implicit none
         real(dp), intent(in) :: x, y
         if (all([x, y] > 0.6_dp .and. [x, y] < 0.8_dp)) then
             rho = 1.0_dp
