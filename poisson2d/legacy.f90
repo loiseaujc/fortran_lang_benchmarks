@@ -28,15 +28,15 @@ program poisson
     integer             :: i, j
     real(dp), parameter :: epsilon0 = 8.85E-12_dp
 
-    ! Tic.
-    call cpu_time(start_time)
-
     ! Initialize right-hand side.
     do j = 1, m
         do i = 1, m
             rhs(i,j) = rho(i*dx,j*dx)
         end do
     end do
+
+    ! Tic.
+    call cpu_time(start_time)
 
     !---------------------------------
     !-----     JACOBI SOLVER     -----
@@ -69,12 +69,11 @@ program poisson
         ! Updated solution.
         phi = phi_prime 
     end do
-
-    write(*, *) "Number of iterations  :", iteration
-    
+   
     ! Toc.
     call cpu_time(end_time)
 
+    write(*, *) "Number of iterations  :", iteration
     write(*, *) "Wall clock time (sec) :", end_time-start_time
 
 contains
