@@ -1,4 +1,11 @@
 program poisson
+    !! This program solves the Poisson equation on the unit square with
+    !! homogeneous Dirichlet boundary conditions. The Laplace operator
+    !! is discretized with the standard second-order accurate central
+    !! finite difference scheme. The resulting discrete problem is solved
+    !! using the Jacobi iterative solver. The numerical implementation
+    !! relies on relatively standard Fortran constructs and is very similar
+    !! to what would be asked from students in a numerical analysis class.
     implicit none
     !----- Sets the double precision kind -----
     integer, parameter :: precision = 15, range = 307
