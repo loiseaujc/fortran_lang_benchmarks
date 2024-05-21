@@ -1,38 +1,13 @@
-module rhs_module
+program poisson
     implicit none
-    public
-
+    !----- Sets the double precision kind -----
     integer, parameter :: precision = 15, range = 307
     integer, parameter :: dp = selected_real_kind(precision, range)
-
-    interface
-        pure real(dp) module function rho(x, y)
-            implicit none
-            real(dp), intent(in) :: x, y
-        end function
-    end interface
-end module
-
-submodule (rhs_module) rho_definition
-    implicit none
-    contains
-    module procedure rho
-        if (all([x, y] > 0.6_dp .and. [x, y] < 0.8_dp)) then
-            rho = 1.0_dp
-        else
-            rho = merge(-1.0_dp, 0.0_dp, all([x, y]>0.2_dp .and. [x, y] < 0.4_dp))
-        endif
-    end procedure
-end submodule
-
-program poisson
-    use rhs_module, only: rho, dp
-    implicit none
-
+ 
     !----- Physical parameters -----
     integer , parameter :: m = 300
     !! Number of grid points in each direction. 
-    real(dp), parameter :: dx = 0.01_dp !1.0_dp / (m-1)
+    real(dp), parameter :: dx = 1.0_dp / (m-1)
     !! Uniform grid size in each direction.
     real(dp) :: rhs(m, m)
     !! Right-hand side of the Poisson equation.
@@ -74,7 +49,7 @@ program poisson
     ! Residual (ensuring at least one iteration is performed).
     residual = 1.0_dp
     ! Rescale rhs.
-    rhs = dx**2/4/epsilon0 * rhs
+    rhs = dx**2/(4*epsilon0) * rhs
 
     ! Iterative solver.
     do while (residual > tolerance )
@@ -95,11 +70,21 @@ program poisson
         phi = phi_prime 
     end do
 
-    write(*, *) "Solution converged to the desired tolerance after", iteration, "iterations."
+    write(*, *) "Number of iterations  :", iteration
     
     ! Toc.
     call cpu_time(end_time)
 
-    write(*, *) "Computation required", end_time-start_time, "seconds (wall clock time)."
+    write(*, *) "Wall clock time (sec) :", end_time-start_time
 
+contains
+     pure real(dp) function rho(x, y)
+        implicit none
+        real(dp), intent(in) :: x, y
+        if (all([x, y] > 0.6_dp .and. [x, y] < 0.8_dp)) then
+            rho = 1.0_dp
+        else
+            rho = merge(-1.0_dp, 0.0_dp, all([x, y]>0.2_dp .and. [x, y] < 0.4_dp))
+        endif
+   end function
 end program
