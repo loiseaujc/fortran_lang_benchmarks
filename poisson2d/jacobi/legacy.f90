@@ -59,7 +59,7 @@ program poisson
     rhs = dx**2/(4*epsilon0) * rhs
 
     ! Iterative solver.
-    do while (residual > tolerance )
+    do while (residual > tolerance)
         ! Update iteration counter.
         iteration = iteration + 1
         ! Reset residual.
